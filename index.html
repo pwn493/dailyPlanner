@@ -1,0 +1,265 @@
+<html>
+<head>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+</head>
+<style type="text/css">
+	body {
+		font-family:verdana;
+	}
+	
+	h1 {
+		font-size:1.3em;
+	}
+	
+	h2 {
+		font-size:1.2em;
+	}
+	
+	.timeSlot {
+		border: .25em solid black;
+		border-radius: 1em;
+		padding: 0 1em 1em 1em;
+		margin: .5em 0 .5em 0;
+		font-size:1em;
+		width:12em;
+		display:inline-block;
+		vertical-align: top;
+	}
+	
+	.plusButton {
+		background-color:#00aa00;
+		float:right;
+		width: 1em;
+		height: 1em;
+		border: 1px solid #005500;
+		color: white;
+		font-weight: bolder;
+		text-align:center;
+		font-family:'helvetica', 'arial', sans-serif;
+	}
+	
+	.plusButton:hover {
+		cursor: pointer;
+	}
+	
+	.newToDo {
+		width: 12em;
+	}
+	
+	.doneButton {
+		background-color: #0000ff;
+		float:left;
+		width:1em;
+		height: 1em;
+		border: 1px solid #000055;
+	}
+	
+	.doneButton:hover {
+		cursor: pointer;
+	}
+	
+	.deleteButton {
+		background-color: #aa0000;
+		float: right;
+		width: 1em;
+		height: 1em;
+		border: 1px solid #550000;
+		color:white;
+		font-family:'helvetica', 'arial', sans-serif;
+		text-align:center;
+		font-weight: bold;
+		padding: 0 1px 3px 1px;
+	}
+	
+	.deleteButton:hover {
+		cursor:pointer;
+	}
+	
+	.toDoList {
+		list-style-type: none;
+		padding-left: 0;
+	}
+	
+	.toDoList > li {
+		clear: both;
+	}
+	
+	.doneItem div.todoText{
+		text-decoration:line-through;
+	}
+	
+	.todoText {
+		display:inline-block;
+		float:left;
+		width:9em;
+	}
+	
+	.blocked {
+		color:#aaaacc;
+	}
+	
+	.inputForm {
+		display: inline-block;
+		margin-top:2px;
+		width:100%;
+	}
+	
+	.clearButton {
+		border: 2px solid black;
+		border-radius: 5px;
+		width:4em;
+		text-align:center;
+		font-weight: bold;
+		float:right;
+		display:inline-block;
+	}
+	
+	.clearButton:hover {
+		cursor:pointer;
+	}
+	
+	.smallText {
+		font-size:.7em;
+	}
+</style>
+<script type="text/javascript">
+	$(document).ready(function () {
+		load();
+		
+		$(document).on('change', '.doneButton',function () {
+			if ($(this).is(':checked')) {
+				$(this).parent().addClass("doneItem");
+				$(this).attr("checked", "checked");
+			} else {
+				$(this).parent().removeClass("doneItem");
+				$(this).removeAttr("checked");
+			}
+			save();
+		});
+		$(document).on('click','.deleteButton', function () {
+			$(this).closest('li').remove();
+			save();
+		});
+		$(document).on('click', '.plusButton',function () {
+			var list = $(this).parent().siblings('.toDoList')[0];
+			var item = $(this).siblings('.newToDo')[0];
+			addToList(item, list);
+			$(item).val("");
+			save();
+		});
+		$(document).on('keypress', '.newToDo', function(e) {
+			var code = (e.keyCode ? e.keyCode : e.which);
+			if (code === 13) {
+				var list = $(e.currentTarget).parent().siblings('.toDoList')[0];
+				var item = $(e.currentTarget);
+				addToList(item, list);
+				$(item).val("");
+				save();
+			}
+		});		
+		$(document).on('click', '.clearButton', function () {
+			clearLists();
+			save();
+		});
+		$(document).on('click', '.todoText', function () {
+			$(this).toggleClass('blocked');
+			save();
+		});;
+	});
+	
+	function addToList(item, list) {
+		var text = $(item).val();
+		$(list).append('<li><input type="checkbox" class="doneButton" /><div class="todoText">' + text + '</div><div class="deleteButton">x</div></li>');
+	}
+	
+	function save() {
+		var listString = buildListString();
+		saveListString(listString);
+	}
+	
+	function buildListString() {
+		return $('#mainContainer').html();
+	}
+	
+	function saveListString(listString) {
+		localStorage.setItem("myListData", listString);
+	}
+	
+	function load() {
+		var listString = retrieveListString();
+		updateLists(listString);
+	}
+	
+	function retrieveListString() {
+		return localStorage["myListData"];
+	}
+	
+	function updateLists(listString) {
+		$('#mainContainer').html(listString);
+	}
+	
+	function clearLists() {
+		$('.toDoList li').remove();
+	}
+</script>
+<body>
+<h1>Daily To Do</h1>
+<div class="clearButton">clear</div><br/>
+<div style="margin:2em; width:45em;" id="mainContainer">
+	<div class="timeSlot" id="timeSlot1">
+		<p class="smallText">(50m - 1hr)</p>
+		<h2>9:00 - 10:00</h2>
+		<ul class="toDoList"></ul>
+		<div class="inputForm">
+			<input class="newToDo" type="textbox" />
+			<div class="plusButton">+</div>
+		</div>
+	</div>
+	<div class="timeSlot" id="timeSlot2">
+		<p class="smallText">(1hr 25m - 1hr 45m)</p>
+		<h2>10:15 - 11:00</h2>
+		<ul class="toDoList"></ul>
+		<div class="inputForm">
+			<input class="newToDo" type="textbox" />
+			<div class="plusButton">+</div>
+		</div>
+	</div>
+	<div class="timeSlot" id="timeSlot3">
+		<p class="smallText">(2hr - 2hr 30m)</p>
+		<h2>11:30 - 12:15</h2>
+		<ul class="toDoList"></ul>
+		<div class="inputForm">
+			<input class="newToDo" type="textbox" />
+			<div class="plusButton">+</div>
+		</div>
+	</div>
+	<div class="timeSlot" id="timeSlot4">
+		<p class="smallText">(2hr 35m - 3hr 15m)</p>
+		<h2>1:30 - 2:15</h2>
+		<ul class="toDoList"></ul>
+		<div class="inputForm">
+			<input class="newToDo" type="textbox" />
+			<div class="plusButton">+</div>
+		</div>
+	</div>
+	<div class="timeSlot" id="timeSlot5">
+		<p class="smallText">(3hr 10m - 4hr)</p>
+		<h2>2:30 - 3:15</h2>
+		<ul class="toDoList"></ul>
+		<div class="inputForm">
+			<input class="newToDo" type="textbox" />
+			<div class="plusButton">+</div>
+		</div>
+	</div>
+	<div class="timeSlot" id="timeSlot5">
+		<p class="smallText">(4hr - 5hr)</p>
+		<h2>3:30 - 4:30</h2>
+		<ul class="toDoList"></ul>
+		<div class="inputForm">
+			<input class="newToDo" type="textbox" />
+			<div class="plusButton">+</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

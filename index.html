@@ -15,7 +15,7 @@
 		font-size:1.2em;
 	}
 	
-	.timeSlot {
+	.timeBlock {
 		border: .25em solid black;
 		border-radius: 1em;
 		padding: 0 1em 1em 1em;
@@ -104,7 +104,7 @@
 		width:100%;
 	}
 	
-	.clearButton {
+	.textButton {
 		border: 2px solid black;
 		border-radius: 5px;
 		width:4em;
@@ -114,7 +114,7 @@
 		display:inline-block;
 	}
 	
-	.clearButton:hover {
+	.textButton:hover {
 		cursor:pointer;
 	}
 	
@@ -140,7 +140,7 @@
 			$(this).closest('li').remove();
 			save();
 		});
-		$(document).on('click', '.plusButton',function () {
+		$(document).on('click', '.addListItem',function () {
 			var list = $(this).parent().siblings('.toDoList')[0];
 			var item = $(this).siblings('.newToDo')[0];
 			addToList(item, list);
@@ -164,7 +164,19 @@
 		$(document).on('click', '.todoText', function () {
 			$(this).toggleClass('blocked');
 			save();
-		});;
+		});
+		$(document).on('click', '.removeTimeSlot', function() {
+			deleteTimeSlots();
+			save();
+		});
+		$(document).on('click', '.addTimeSlot', function () {
+			var timeRange = $('.timeRange').val();
+			var timeDone = $('.timeDone').val();
+			addNewTimeSlot(timeRange, timeDone);
+			$('.timeRange').val('');
+			$('.timeDone').val('');
+			save();
+		});
 	});
 	
 	function addToList(item, list) {
@@ -187,7 +199,9 @@
 	
 	function load() {
 		var listString = retrieveListString();
-		updateLists(listString);
+		if (listString && listString != '') {
+			updateLists(listString);
+		}
 	}
 	
 	function retrieveListString() {
@@ -201,65 +215,43 @@
 	function clearLists() {
 		$('.toDoList li').remove();
 	}
+
+	function deleteTimeSlots() {
+		$('.timeSlot').remove();
+	}
+
+	function addNewTimeSlot(timeRange, timeDone) {
+		$('#mainContainer').append('<div class="timeSlot timeBlock" id="timeSlot1"> \
+				<p class="smallText">' + timeDone + '</p> \
+				<h2>' + timeRange + '</h2> \
+				<ul class="toDoList"></ul> \
+				<div class="inputForm"> \
+					<input class="newToDo" type="textbox" /> \
+					<div class="plusButton addListItem">+</div> \
+				</div> \
+			</div>');
+	}
 </script>
 <body>
 <h1>Daily To Do</h1>
-<div class="clearButton">clear</div><br/>
+<div class="clearButton textButton">clear</div><br/>
 <div style="margin:2em; width:45em;" id="mainContainer">
-	<div class="timeSlot" id="timeSlot1">
-		<p class="smallText">(50m - 1hr)</p>
-		<h2>9:00 - 10:00</h2>
+	<div class="timeSlot timeBlock">
+		<p class="smallText">work done</p>
+		<h2>Start - End</h2>
 		<ul class="toDoList"></ul>
 		<div class="inputForm">
 			<input class="newToDo" type="textbox" />
-			<div class="plusButton">+</div>
-		</div>
-	</div>
-	<div class="timeSlot" id="timeSlot2">
-		<p class="smallText">(1hr 25m - 1hr 45m)</p>
-		<h2>10:15 - 11:00</h2>
-		<ul class="toDoList"></ul>
-		<div class="inputForm">
-			<input class="newToDo" type="textbox" />
-			<div class="plusButton">+</div>
-		</div>
-	</div>
-	<div class="timeSlot" id="timeSlot3">
-		<p class="smallText">(2hr - 2hr 30m)</p>
-		<h2>11:30 - 12:15</h2>
-		<ul class="toDoList"></ul>
-		<div class="inputForm">
-			<input class="newToDo" type="textbox" />
-			<div class="plusButton">+</div>
-		</div>
-	</div>
-	<div class="timeSlot" id="timeSlot4">
-		<p class="smallText">(2hr 35m - 3hr 15m)</p>
-		<h2>1:30 - 2:15</h2>
-		<ul class="toDoList"></ul>
-		<div class="inputForm">
-			<input class="newToDo" type="textbox" />
-			<div class="plusButton">+</div>
-		</div>
-	</div>
-	<div class="timeSlot" id="timeSlot5">
-		<p class="smallText">(3hr 10m - 4hr)</p>
-		<h2>2:30 - 3:15</h2>
-		<ul class="toDoList"></ul>
-		<div class="inputForm">
-			<input class="newToDo" type="textbox" />
-			<div class="plusButton">+</div>
-		</div>
-	</div>
-	<div class="timeSlot" id="timeSlot5">
-		<p class="smallText">(4hr - 5hr)</p>
-		<h2>3:30 - 4:30</h2>
-		<ul class="toDoList"></ul>
-		<div class="inputForm">
-			<input class="newToDo" type="textbox" />
-			<div class="plusButton">+</div>
+			<div class="plusButton addListItem">+</div>
 		</div>
 	</div>
 </div>
+<div class="newTimeSlot timeBlock">
+	<p>New time slot</p>
+	<input class="timeRange" type="textbox" placeholder="start - end" /><br/>
+	<input class="timeDone" type="textbox" placeholder="work done" />
+	<div class="plusButton addTimeSlot">+</div>
+</div>
+<div class="removeTimeSlot textButton">Delete Time Slots</div>
 </body>
 </html>
